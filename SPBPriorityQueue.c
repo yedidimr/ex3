@@ -9,7 +9,15 @@ typedef struct sp_bp_queue_t* SPBPQueue {
 };
 
 SPBPQueue spBPQueueCreate(int maxSize){
-	SPBPQueue queue = malloc();
+	SPBPQueue queue;
+	if (maxSize < 0) {
+		return NULL;
+	}
+	if (maxSize == 0) {
+		print_warning("creating queue of max size 0");
+	}
+
+	queue = (SPBPQueue)malloc(sizeof(*queue));
 	if (queue == NULL) {
 		print_error("error allocating new queue");
 		return NULL;
@@ -26,7 +34,7 @@ SPBPQueue spBPQueueCopy(SPBPQueue source) {
 		return NULL;
 	}
 
-	new_queue = (SPBPQueue)malloc(sizeof(new_queue));
+	new_queue = (SPBPQueue)malloc(sizeof(*new_queue));
 	if (new_queue == NULL) {
 		print_error("ALLOCATION ERRorr");
 		return NULL;
