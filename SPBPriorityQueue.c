@@ -138,7 +138,7 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue source, SPListElement element) {
 	}
 	
 	// insert new element in the right place in queue
-  	SP_LIST_FOREACH(SPListElement, e, list) {
+  	SP_LIST_FOREACH(SPListElement, e, source->head) {
   		eVal = spListElementGetValue(e);
 		
 		// if we didn't try to insert already
@@ -207,11 +207,13 @@ SPListElement spBPQueuePeekLast(SPBPQueue source) {
 }
 
 double spBPQueueMinValue(SPBPQueue source) {
+	assert(source!=NULL);
 	return spListElementGetValue(spListGetFirst(source->head));
 }
 
 
 double spBPQueueMaxValue(SPBPQueue source) {
+	assert(source!=NULL);
 	SPListElement currentElement = spListGetFirst(source->head);
 	if (currentElement == NULL) {
 		return NULL;
@@ -224,10 +226,12 @@ double spBPQueueMaxValue(SPBPQueue source) {
 
 
 bool spBPQueueIsEmpty(SPBPQueue source) {
-	return spListGetSize(source->head) == 0;
+	assert(source!=NULL);
+	return spBPQueueSize(source->head) == 0;
 }
 
 bool spBPQueueIsFull(SPBPQueue source) {
-	return source->size == spListGetSize(source->head);
+	assert((source!=NULL) && (spBPQueueIsEmpty(source) == false));
+	return spBPQueueGetMaxSize(source) == spBPQueueSize(source->head);
 }
 

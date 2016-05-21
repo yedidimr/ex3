@@ -25,8 +25,9 @@ typedef enum sp_bp_queue_msg_t {
  * Allocates a new queue.
  *
  * This function creates a new empty queue.
+ * @param maxSize - the maximun capacity of the queue to be created
  * @return
- * 	NULL - If allocations failed.
+ * 	NULL - If allocations failed or if maxSize if smaller than 0.
  * 	A new empty queue in case of success.
  */
 SPBPQueue spBPQueueCreate(int maxSize);
@@ -118,7 +119,7 @@ SP_BPQUEUE_MSG spBPQueueDequeue(SPBPQueue source);
  * creates a new copy of the element with the lowest value in queue
  * @param source The queue which peek will be returned
  * @retun
- *		 NULL if queue is empty, if a NULL pointer was swnt or if there was an allocation error
+ *		 NULL if queue is empty, if a NULL pointer was sent or if there was an allocation error
  *		 Otherwise, the new copy of the element with the highest value in queue
  */
  SPListElement spBPQueuePeek(SPBPQueue source);
@@ -127,7 +128,7 @@ SP_BPQUEUE_MSG spBPQueueDequeue(SPBPQueue source);
  * creates a new copy of the element with the highest value in queue
  * @param source The queue which last peek will be returned
  * @return
- *		 NULL if queue is empty, if a NULL pointer was swnt or if there was an allocation error
+ *		 NULL if queue is empty, if a NULL pointer was sent or if there was an allocation error
  *		 Otherwise, the new copy of the element with the highest value in queue
  */
 SPListElement spBPQueuePeekLast(SPBPQueue source);
