@@ -1,30 +1,47 @@
+#include <assert.h>
+#include <stdlib.h>
+#include <string.h>
+#include "SPList.h"
+#include "SPBPriorityQueue.h"
+#include "SPLogger.h"
+
 /*
 * converts SP_LIST_MSG to SP_BPQUEUEMSG
 */
 SP_BPQUEUE_MSG convertListMsgToQueueMsg(SP_LIST_MSG msg);
 
-typedef struct sp_bp_queue_t* SPBPQueue {
+struct sp_bp_queue_t {
 	int size; 		//the maximum capacity of the queue
 	SPList head; 	// points to a SPList which will hold queues elements
 };
 
 SPBPQueue spBPQueueCreate(int maxSize){
 	SPBPQueue queue;
+	SP_LOGGER_MSG logmsg;
+	const char* logFile = "spBPQueue.log";
+	// initialize logger
+	logmsg = spLoggerCreate(logFile, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL);
+	if ((logmsg == SP_LOGGER_OUT_OF_MEMORY) || (logmsg == SP_LOGGER_CANNOT_OPEN_FILE)) {
+		return NULL;
+	}
 	if (maxSize < 0) {
+		spLoggerPrintError("cannot create queue with negative size", __FILE__, __func__, __LINE__);
 		return NULL;
 	}
 	if (maxSize == 0) {
-		print_warning("creating queue of max size 0");
+		spLoggerPrintWarning("creating queue of max size 0", __FILE__, __func__, __LINE__);
 	}
 
 	queue = (SPBPQueue)malloc(sizeof(*queue));
 	if (queue == NULL) {
-		print_error("error allocating new queue");
+		spLoggerPrintError("error allocating new queue", __FILE__, __func__, __LINE__);
 		return NULL;
 	}
+
+	// initializing queue arguments
 	queue->size = maxSize;
 	queue->head = spListCreate();
-	
+
 	return queue;
 }
 
@@ -36,17 +53,17 @@ SPBPQueue spBPQueueCopy(SPBPQueue source) {
 
 	new_queue = (SPBPQueue)malloc(sizeof(*new_queue));
 	if (new_queue == NULL) {
-		print_error("ALLOCATION ERRorr");
+		spLoggerPrintError("ALLOCATION ERRorr", __FILE__, __func__, __LINE__);
 		return NULL;
 	}
 	new_queue->size = source->size;
 	if (source->head == NULL) {
-		print_warning("trying to copy and NUlL pointer");
+		spLoggerPrintWarning("trying to copy and NUlL pointer", __FILE__, __func__, __LINE__);
 		new_queue->head = NULL;
 	} else {
 		new_queue->head = spListCopy(source->head);
 		if (new_queue->head == NULL) {
-			print_error("allocation error - error allocationg list");
+			spLoggerPrintError("allocation error - error allocationg list", __FILE__, __func__, __LINE__);
 		}
 	}
 	return new_queue;
@@ -55,20 +72,21 @@ void spBPQueueDestroy(SPBPQueue source){
 	if (source != NULL) {
 		if (source->head != NULL) {
 			spListDestroy(source->head);
+			spLoggerDestroy();
 		}
 		free(source);
 	}
 	else {
-		print_warning("didnt destroy null pointer");
+		spLoggerPrintWarning("didnt destroy null pointer", __FILE__, __func__, __LINE__);
 	}
 }
 void spBPQueueClear(SPBPQueue source) {
 	SP_LIST_MSG msg = spListClear(source->head);
 	if (msg == SP_LIST_NULL_ARGUMENT) {
-		print_warning("try to clear an NULL pointer");
+		spLoggerPrintWarning("try to clear an NULL pointer", __FILE__, __func__, __LINE__);
 	} 
 	else {
-		print_info("cleared queue successfully");
+		spLoggerPrintInfo("cleared queue successfully");
 	}
 
 }
@@ -93,9 +111,7 @@ SP_BPQUEUE_MSG convertListMsgToQueueMsg(SP_LIST_MSG msg) {
 	else if ((msg == SP_LIST_INVALID_CURRENT) ||(msg == SP_LIST_NULL_ARGUMENT)) {
 		return SP_BPQUEUE_INVALID_ARGUMENT;
 	}
-	else if (msg == SP_LIST_SUCCESS) {
-		return SP_BPQUEUE_SUCCESS;
-	}	
+	return SP_BPQUEUE_SUCCESS;
 }
 
 SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue source, SPListElement element) {
@@ -104,6 +120,7 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue source, SPListElement element) {
 	double eVal;   // iterates over all values in the queue
 	SPListElement elementCopy; // a copy of the element
 	SP_LIST_MSG msg;
+	bool success; // true if enqueued successfully
 
 	// argument validation check
 	if (element == NULL || source == NULL) {
@@ -122,7 +139,7 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue source, SPListElement element) {
 		return convertListMsgToQueueMsg(msg);
 	} 
 
-	newVal = SPListElement(element);
+	newVal = spListElementGetValue(element);
 	maxVal = spBPQueueMaxValue(source);
 	// if new value to insert is bigger than the maximum value - insert it to the end of the queue if it's not full
 	if (newVal >= maxVal) {
@@ -144,12 +161,15 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue source, SPListElement element) {
 		// if we didn't try to insert already
 		// and the current value is bigger than the new value
 		// than insert the new value before the current value
-		if ((msg != NULL) && (newVal < eVal)) {
+		if ((!success) && (newVal < eVal)) {
 			msg = spListInsertBeforeCurrent(source->head, elementCopy);
 			// return in case of failure
 			// keep iterating till the end of the queue in case of success insert
 			if (msg != SP_LIST_SUCCESS) {
 				return convertListMsgToQueueMsg(msg);
+			}
+			else {
+				success = true;
 			}
 		}
 	}
@@ -165,9 +185,6 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue source, SPListElement element) {
 
 
 SP_BPQUEUE_MSG spBPQueueDequeue(SPBPQueue source) {
-	SPListElement currentElement;
-	SP_LIST_MSG msg ;
-
 	if (source == NULL) {
 		return SP_BPQUEUE_INVALID_ARGUMENT;	
 	}
@@ -177,7 +194,7 @@ SP_BPQUEUE_MSG spBPQueueDequeue(SPBPQueue source) {
 	}
 	// set current iterator to the first element and remove it 
 	// (first element in the queue is the element with the minimum value)
-	currentElement = spListGetFirst(source->head);
+	spListGetFirst(source->head);
 	return convertListMsgToQueueMsg(spListRemoveCurrent(source->head));
 }
 
@@ -216,7 +233,7 @@ double spBPQueueMaxValue(SPBPQueue source) {
 	assert(source!=NULL);
 	SPListElement currentElement = spListGetFirst(source->head);
 	if (currentElement == NULL) {
-		return NULL;
+		return -1.0;
 	}
 	while (currentElement) {
 		currentElement = spListGetNext(source->head);
@@ -227,11 +244,12 @@ double spBPQueueMaxValue(SPBPQueue source) {
 
 bool spBPQueueIsEmpty(SPBPQueue source) {
 	assert(source!=NULL);
-	return spBPQueueSize(source->head) == 0;
+	return spBPQueueSize(source) == 0;
 }
 
 bool spBPQueueIsFull(SPBPQueue source) {
 	assert((source!=NULL) && (spBPQueueIsEmpty(source) == false));
-	return spBPQueueGetMaxSize(source) == spBPQueueSize(source->head);
+	assert(source!=NULL);
+	return spBPQueueGetMaxSize(source) == spBPQueueSize(source);
 }
 
