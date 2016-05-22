@@ -11,7 +11,7 @@
 
 //TODO: find out about creating and destroying logger
 //TODO: is it OK to always use -> ?
-//TODO: Placement of assert - asked in forum
+//TODO: Placement of assert - asked in forumm
 
 
 struct sp_point_t{
