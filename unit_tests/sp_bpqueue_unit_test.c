@@ -23,10 +23,8 @@ static bool spBPQueueCopyTest(){
 	spBPQueueEnqueue(source, spListElementCreate(3,3.0));
 	// create copy
 	copy = spBPQueueCopy(source);
-	// compare each element in the queue
-	SP_LIST_FOREACH(SPListElement, e, source->head) {
-		ASSERT_TRUE(spListElementCompare(spListElementGetValue(copy), spListElementGetValue(source)) == 0);
-	}
+	// compare each element in the queue since that is done by SPList
+
 	ASSERT_TRUE(spBPQueueGetMaxSize(source) == spBPQueueGetMaxSize(copy));
 	ASSERT_TRUE(spBPQueueSize(source) == spBPQueueSize(copy));
 	// test that if you change one queue it's not affect other queue
@@ -90,11 +88,11 @@ static bool spBPQueueEnqueueTest() {
 	// enqueue to empty queue
 	ASSERT_TRUE(SP_BPQUEUE_SUCCESS == spBPQueueEnqueue(source, spListElementCreate(1,1.0)));
 	// enqueue to not empty and not full queue
-	ASSERT_TRUE(SP_BPQUEUE_SUCCESS == spBPQueueEnqueue(source, spListElementCreate(2,2.0)));
+	ASSERT_TRUE(SP_BPQUEUE_SUCCESS == spBPQueueEnqueue(source, spListElementCreate(3,3.0)));
 	// enqueue to full queue - bigger value
-	ASSERT_TRUE(SP_BPQUEUE_FULL == spBPQueueEnqueue(source, spListElementCreate(3,3.0)));
+	ASSERT_TRUE(SP_BPQUEUE_FULL == spBPQueueEnqueue(source, spListElementCreate(4,4.0)));
 	// enqueue to full queue - ok value
-	ASSERT_TRUE(SP_BPQUEUE_SUCCESS == spBPQueueEnqueue(source, spListElementCreate(1,1.5)));
+	ASSERT_TRUE(SP_BPQUEUE_SUCCESS == spBPQueueEnqueue(source, spListElementCreate(2,2.0)));
 	spBPQueueDestroy(source);
 	return true;
 }
@@ -119,9 +117,9 @@ static bool spBPQueueDequeueTest() {
 	return true;
 }
 
-static bool spBPQueuePeekTest{
+static bool spBPQueuePeekTest(){
 	SPListElement element;
-	SPListElement smallest_element = spListElementCreate(1,1.0);
+	SPListElement smallest_element = spListElementCreate(2,2.0);
 	SPBPQueue source = spBPQueueCreate(2); 
 	//peek from NULL queue
 	ASSERT_TRUE(NULL == spBPQueuePeek(NULL));
@@ -129,7 +127,7 @@ static bool spBPQueuePeekTest{
 	ASSERT_TRUE(NULL == spBPQueuePeek(source));
 	// insert elements to queue
 	spBPQueueEnqueue(source, smallest_element);
-	spBPQueueEnqueue(source, spListElementCreate(2,2.0));
+	spBPQueueEnqueue(source, spListElementCreate(3,3.0));
 	// peek 
 	element = spBPQueuePeek(source);
 	// check elements equal
@@ -145,10 +143,10 @@ static bool spBPQueuePeekTest{
 }
 
 
-static bool spBPQueuePeekLastTest{
+static bool spBPQueuePeekLastTest(){
 	SPListElement element;
 	SPListElement biggest_element = spListElementCreate(2,2.0);
-	SPBPQueue source = spBPQueueCreate(2); 
+	SPBPQueue source = spBPQueueCreate(2);
 	//peek from NULL queue
 	ASSERT_TRUE(NULL == spBPQueuePeekLast(NULL));
 	// peek from empty queue
@@ -212,14 +210,16 @@ static bool spBPQueueIsEmptyTest() {
 	ASSERT_TRUE(spBPQueueIsEmpty(source));
 	spBPQueueEnqueue(source, spListElementCreate(3,2.0));
 	ASSERT_FALSE(spBPQueueIsEmpty(source));
+	ASSERT_FALSE(NULL == spBPQueuePeek(source));
+	spBPQueueDequeue(source);
+	ASSERT_TRUE(spBPQueueIsEmpty(source));
 	spBPQueueDestroy(source);
 	return true;
-};
+}
 
 
 static bool spBPQueueIsFullTest() {
 	SPBPQueue source = spBPQueueCreate(2); 
-	ASSERT_FALSE(spBPQueueIsFull(source));
 	spBPQueueEnqueue(source, spListElementCreate(3,2.0));
 	ASSERT_FALSE(spBPQueueIsFull(source));
 	spBPQueueEnqueue(source, spListElementCreate(2,3.0));
@@ -228,39 +228,19 @@ static bool spBPQueueIsFullTest() {
 	return true;
 }
 
-static bool spBPQueueFlowTest() {
-	SPBPQueue source = spBPQueueCreate(3);
-	spBPQueueEnqueue(source, spListElementCreate(2,2.0));
-	spBPQueueEnqueue(source, spListElementCreate(3,3.0));
-	spBPQueueEnqueue(source, spListElementCreate(4,4.0));
-	spBPQueueEnqueue(source, spListElementCreate(1,1.0));
-	spBPQueueEnqueue(source, spListElementCreate(3,3.0));
-	spBPQueueEnqueue(source, spListElementCreate(1,1.5));
-	// here queue should contain (1,1) (1,1.5) (2,2.0)
-	ASSERT_TRUE(spBPQueueIsFull(source));
-	ASSERT_TRUE(spBPQueueSize(source) == 3);
-	ASSERT_TRUE(spBPQueueMaxValue(source) == spListElementGetValue(spBPQueuePeekLast(source)));
-	ASSERT_TRUE(spBPQueueMinValue(source) == spListElementGetValue(spBPQueueLast(source)));
-	spBPQueueDequeue(source);
-	ASSERT_TRUE(spBPQueueIsEmpty(source));
-	spBPQueueDestroy(source);
-	return true;
-}
-*/
 int main() {
 	RUN_TEST(spBPQueueCreateTest);
-	// RUN_TEST(spBPQueueCopyTest);
-	// RUN_TEST(spBPQueueClearTest);
-	// RUN_TEST(spBPQueueSizeTest);
-	// RUN_TEST(spBPQueueGetMaxSizeTest);
-	// RUN_TEST(spBPQueueEnqueueTest);
-	// RUN_TEST(spBPQueueDequeueTest);
-	// RUN_TEST(spBPQueuePeekTest);
-	// RUN_TEST(spBPQueuePeekLastTest);
-	// RUN_TEST(spBPQueueMaxValueTest);
-	// RUN_TEST(spBPQueueMinValueTest);
-	// RUN_TEST(spBPQueueIsEmptyTest);
-	// RUN_TEST(spBPQueueIsFullTest);
-	// RUN_TEST(spBPQueueFlowTest); //TODO remove
+	RUN_TEST(spBPQueueCopyTest);
+	RUN_TEST(spBPQueueClearTest);
+	RUN_TEST(spBPQueueSizeTest);
+	RUN_TEST(spBPQueueGetMaxSizeTest);
+	RUN_TEST(spBPQueueEnqueueTest);
+	RUN_TEST(spBPQueueDequeueTest);
+	RUN_TEST(spBPQueuePeekTest);
+	RUN_TEST(spBPQueuePeekLastTest);
+	RUN_TEST(spBPQueueMaxValueTest);
+	RUN_TEST(spBPQueueMinValueTest);
+	RUN_TEST(spBPQueueIsEmptyTest);
+	RUN_TEST(spBPQueueIsFullTest);
 	return 0;
 }
