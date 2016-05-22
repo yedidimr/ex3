@@ -70,7 +70,7 @@ SPBPQueue spBPQueueCopy(SPBPQueue source) {
 	} else {
 		new_queue->head = spListCopy(source->head);
 		if (new_queue->head == NULL) {
-			spLoggerPrintError("allocation error - error allocationg list", __FILE__, __func__, __LINE__);
+			spLoggerPrintError("allocation error - error allocating list", __FILE__, __func__, __LINE__);
 		}
 	}
 	return new_queue;
@@ -84,7 +84,7 @@ void spBPQueueDestroy(SPBPQueue source){
 		free(source);
 	}
 	else {
-		spLoggerPrintWarning("didnt destroy null pointer", __FILE__, __func__, __LINE__);
+		spLoggerPrintWarning("didn't destroy null pointer", __FILE__, __func__, __LINE__);
 	}
 }
 void spBPQueueClear(SPBPQueue source) {
@@ -148,7 +148,7 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue source, SPListElement element) {
 	if (spBPQueueIsEmpty(source)){
 		msg = convertListMsgToQueueMsg(spListInsertFirst(source->head, elementCopy));
 		if (msg != SP_BPQUEUE_SUCCESS) {
-				spLoggerPrintError("could not insert new element to the begining of the queue", __FILE__, __func__, __LINE__);
+				spLoggerPrintError("could not insert new element to the beginning of the queue", __FILE__, __func__, __LINE__);
 		}
 		return msg;
 	} 
@@ -219,7 +219,7 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue source, SPListElement element) {
 	// }
 
 	// at this point, iterator is at the end of the queue
-	// if the queue has more elementes than it's maximum size - remove last element from the queue
+	// if the queue has more elements than it's maximum size - remove last element from the queue
 	if (spBPQueueSize(source) > spBPQueueGetMaxSize(source)) {
 		msg = spQueueRemoveLast(source);
 	}
