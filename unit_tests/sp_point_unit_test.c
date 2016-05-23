@@ -21,13 +21,13 @@ bool pointBasicCreateTest() {
 	//check create works in general
 	ASSERT_TRUE(spPointGetIndex(p1) == index);
 	ASSERT_TRUE(spPointGetDimension(p1) == dim);
-	for (int i = 0; i < dim; i++) {
+	for (i = 0; i < dim; i++) {
 		ASSERT_TRUE(spPointGetAxisCoor(p1, i) == data1[i]);
 	}
 	//check create works when length(Data)>dim
 	ASSERT_TRUE(spPointGetIndex(p2) == index);
 	ASSERT_TRUE(spPointGetDimension(p2) == dim);
-	for (int i = 0; i < dim; i++) {
+	for (i = 0; i < dim; i++) {
 		ASSERT_TRUE(spPointGetAxisCoor(p2, i) == data2[i]);
 	}
 	//check create returns NULL when data==Null
@@ -69,7 +69,7 @@ bool pointGetDimentionTest() {
 	int dim = 5;
 	int index = 3;
 	SPPoint p = spPointCreate(data, dim, index);
-	ASSERT_TRUE(spPointGetDimention(p) == 5);
+	ASSERT_TRUE(spPointGetDimension(p) == 5);
 	spPointDestroy(p);
 	return true;
 }
@@ -98,7 +98,7 @@ bool pointGetAxisCoorTest() {
 	SPPoint p1 = spPointCreate(data1, dim, index);
 	SPPoint p2 = spPointCreate(data2, dim, index);
 	//assertions for p1
-	for (int i = 0; i < dim; i++) {
+	for (i = 0; i < dim; i++) {
 		ASSERT_TRUE(spPointGetAxisCoor(p1, i) == data1[i]);
 	}
 	//assertions for p2, spPointGetAxisCoor works also when length(data)>dim
