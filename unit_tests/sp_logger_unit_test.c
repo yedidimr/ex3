@@ -70,9 +70,189 @@ static bool basicLoggerDebugTest() {
 	return true;
 }
 
+static bool basicLoggerInfoTest() {
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	// TODO finish and doc
+	spLoggerDestroy();
+	return true;
+
+}
+
+static bool basicLoggerWarningTest() {
+	// TODO finish and doc
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+	return true;
+
+}
+
+// test spLoggerCreate function
+static bool spLoggerCreateTest() {
+	const char* badFile = "\n~~@#%%^s\\n/tf\n";
+	
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_DEFINED);
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_DEFINED);
+	spLoggerDestroy();
+	ASSERT_TRUE(spLoggerCreate(badFile, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_CANNOT_OPEN_FILE);
+	spLoggerDestroy();
+	
+	return true;
+}
+
+static bool spLoggerPrintWarningTest() {
+	// test edge cases
+	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_UNDIFINED);
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintWarning(NULL,"sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
+	ASSERT_TRUE(spLoggerPrintWarning("MSGB",NULL,__func__,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
+	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",NULL,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
+	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,-12) == SP_LOGGER_INVAlID_ARGUMENT);
+	ASSERT_TRUE(spLoggerPrintWarning("MSGB",NULL,NULL,-1) == SP_LOGGER_INVAlID_ARGUMENT);
+	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+	
+	// test each debug level
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+	
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+
+	return true;
+}
+
+static bool spLoggerPrintErrorTest() {
+ 	// test edge cases
+	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_UNDIFINED);
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintError(NULL,"sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
+	ASSERT_TRUE(spLoggerPrintError("MSGB",NULL,__func__,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
+	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",NULL,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
+	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,-12) == SP_LOGGER_INVAlID_ARGUMENT);
+	ASSERT_TRUE(spLoggerPrintError("MSGB",NULL,NULL,-1) == SP_LOGGER_INVAlID_ARGUMENT);
+	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+	
+	// test each debug level
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL ) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+
+	return true;
+}
+
+
+
+static bool spLoggerPrintInfoTest(){
+
+	// test edge cases
+	ASSERT_TRUE(spLoggerPrintInfo("MSGB") == SP_LOGGER_UNDIFINED);
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintInfo(NULL) == SP_LOGGER_INVAlID_ARGUMENT);
+	ASSERT_TRUE(spLoggerPrintInfo("MSGB") == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+	
+	// test each debug level
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintInfo("MSGB") == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+
+
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintInfo("MSGB") == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+
+	
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintInfo("MSGB") == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+
+	return true;
+
+}
+
+
+static bool spLoggerPrintDebugTest() {
+
+// test edge cases
+	ASSERT_TRUE(spLoggerPrintDebug("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_UNDIFINED);
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintDebug("MSGB",NULL,__func__,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
+	ASSERT_TRUE(spLoggerPrintDebug(NULL,"sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
+	ASSERT_TRUE(spLoggerPrintDebug("MSGB","sp_logger_unit_test.c",NULL,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
+	ASSERT_TRUE(spLoggerPrintDebug("MSGB","sp_logger_unit_test.c",__func__,-12) == SP_LOGGER_INVAlID_ARGUMENT);
+	ASSERT_TRUE(spLoggerPrintDebug("MSGB",NULL,NULL,-1) == SP_LOGGER_INVAlID_ARGUMENT);
+	ASSERT_TRUE(spLoggerPrintDebug("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+	
+	// test each debug level
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintDebug("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+	
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+
+	return true;
+}
+
+
+static bool spLoggerPrintMsgTest() {
+
+// test edge cases
+	ASSERT_TRUE(spLoggerPrintMsg("MSGB") == SP_LOGGER_UNDIFINED);
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintMsg(NULL) == SP_LOGGER_INVAlID_ARGUMENT);
+	ASSERT_TRUE(spLoggerPrintMsg("MSGB") == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+
+
+	// test each debug level
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintMsg("MSGB") == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintMsg("MSGB") == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+	
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintMsg("MSGB") == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+	return true;
+}
+
 int main() {
 	RUN_TEST(basicLoggerTest);
 	RUN_TEST(basicLoggerErrorTest);
 	RUN_TEST(basicLoggerDebugTest);
+	RUN_TEST(basicLoggerWarningTest);
+	RUN_TEST(basicLoggerInfoTest);
+	RUN_TEST(spLoggerPrintErrorTest);
+	RUN_TEST(spLoggerPrintWarningTest);
+	RUN_TEST(spLoggerPrintDebugTest);
+	RUN_TEST(spLoggerPrintInfoTest);
+	RUN_TEST(spLoggerPrintMsgTest);
+	RUN_TEST(spLoggerCreateTest);
 	return 0;
 }
