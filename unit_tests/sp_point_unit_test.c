@@ -6,7 +6,7 @@
 //TODO: do we need to check destroy? if so, how?
 
 //check if create works
-bool pointBasicCreateTest() {
+static bool pointBasicCreateTest() {
 	double data1[5] = {0.0, 1.0, 2.0, 3.0, 4.0};
 	double data2[7] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 	int dim = 5;
@@ -46,7 +46,7 @@ bool pointBasicCreateTest() {
 }
 
 //Checks if spPointCopy Works
-bool pointBasicCopyTest() {
+static bool pointBasicCopyTest() {
 	double data[2] = { 1.0, 1.0 };
 	int dim = 2;
 	int index = 1;
@@ -63,7 +63,7 @@ bool pointBasicCopyTest() {
 }
 
 //Checks if spPointGetDimension Works
-bool pointGetDimentionTest() {
+static bool pointGetDimentionTest() {
 	double data[5] = {0.0, 1.0, 2.0, 3.0, 4.0};
 	int dim = 5;
 	int index = 3;
@@ -74,7 +74,7 @@ bool pointGetDimentionTest() {
 }
 
 //Checks if spPointGetIndex Works
-bool pointGetIndexTest() {
+static bool pointGetIndexTest() {
 	double data[5] = {4.0, 3.0, 2.0, 1.0, 1.0};
 	int dim = 5;
 	int index = 3;
@@ -85,7 +85,7 @@ bool pointGetIndexTest() {
 }
 
 //Checks if spPointGetAxisCoor Works
-bool pointGetAxisCoorTest() {
+static bool pointGetAxisCoorTest() {
 	double data1[5] = {0.0, 1.0, 2.0, 3.0, 4.0};
 	double data2[7] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
 	int dim = 5;
@@ -108,7 +108,7 @@ bool pointGetAxisCoorTest() {
 }
 
 //check if spPointL2SquaredDistance works
-bool pointBasicL2Distance() {
+static bool pointBasicL2Distance() {
 	double data1[2] = { 1.0, 1.0 };
 	double data2[2] = { 1.0, 0.0 };
 	int dim1 = 2;
@@ -124,6 +124,7 @@ bool pointBasicL2Distance() {
 	spPointDestroy(q);
 	return true;
 }
+
 int main() {
 	RUN_TEST(pointBasicCreateTest);
 	RUN_TEST(pointBasicCopyTest);
