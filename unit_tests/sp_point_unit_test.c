@@ -2,7 +2,50 @@
 #include "unit_test_util.h"
 #include <stdbool.h>
 
-//Checks if copy Works
+//TODO: do we need to check NULL and assert?
+//TODO: do we need to check destroy? if so, how?
+
+//check if create works
+bool pointBasicCreateTest() {
+	double data1[5] = {0.0, 1.0, 2.0, 3.0, 4.0};
+	double data2[7] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+	int dim = 5;
+	int index = 5;
+	int i;
+	//create points
+	SPPoint p1 = spPointCreate(data1, dim, index);
+	SPPoint p2 = spPointCreate(data2, dim, index);
+	SPPoint p3 = spPointCreate(NULL, dim, index);
+	SPPoint p4 = spPointCreate(data1, 0, index);
+	SPPoint p5 = spPointCreate(data1, dim, -1);
+	//check create works in general
+	ASSERT_TRUE(spPointGetIndex(p1) == index);
+	ASSERT_TRUE(spPointGetDimension(p1) == dim);
+	for (i = 0; i < dim; i++) {
+		ASSERT_TRUE(spPointGetAxisCoor(p1, i) == data1[i]);
+	}
+	//check create works when length(Data)>dim
+	ASSERT_TRUE(spPointGetIndex(p2) == index);
+	ASSERT_TRUE(spPointGetDimension(p2) == dim);
+	for (i = 0; i < dim; i++) {
+		ASSERT_TRUE(spPointGetAxisCoor(p2, i) == data2[i]);
+	}
+	//check create returns NULL when data==Null
+	ASSERT_TRUE(p3 == NULL);
+	//check create returns NULL when dim=0
+	ASSERT_TRUE(p4 == NULL);
+	//check create returns NULL when index==-1
+	ASSERT_TRUE(p5 == NULL);
+	//destroy points
+	spPointDestroy(p1);
+	spPointDestroy(p2);
+	spPointDestroy(p3);
+	spPointDestroy(p4);
+	spPointDestroy(p5);
+	return true;
+}
+
+//Checks if spPointCopy Works
 bool pointBasicCopyTest() {
 	double data[2] = { 1.0, 1.0 };
 	int dim = 2;
@@ -18,6 +61,56 @@ bool pointBasicCopyTest() {
 	spPointDestroy(q);
 	return true;
 }
+
+//Checks if spPointGetDimension Works
+//TODO: has assert- do I need to check it?
+bool pointGetDimentionTest() {
+	double data[5] = {0.0, 1.0, 2.0, 3.0, 4.0};
+	int dim = 5;
+	int index = 3;
+	SPPoint p = spPointCreate(data, dim, index);
+	ASSERT_TRUE(spPointGetDimension(p) == 5);
+	spPointDestroy(p);
+	return true;
+}
+
+//Checks if spPointGetIndex Works
+//TODO: has assert- do I need to check it?
+bool pointGetIndexTest() {
+	double data[5] = {4.0, 3.0, 2.0, 1.0, 1.0};
+	int dim = 5;
+	int index = 3;
+	SPPoint p = spPointCreate(data, dim, index);
+	ASSERT_TRUE(spPointGetIndex(p) == 3);
+	spPointDestroy(p);
+	return true;
+}
+
+//Checks if spPointGetAxisCoor Works
+//TODO: has assert- do I need to check it?
+bool pointGetAxisCoorTest() {
+	double data1[5] = {0.0, 1.0, 2.0, 3.0, 4.0};
+	double data2[7] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+	int dim = 5;
+	int index = 3;
+	int i;
+	//create points
+	SPPoint p1 = spPointCreate(data1, dim, index);
+	SPPoint p2 = spPointCreate(data2, dim, index);
+	//assertions for p1
+	for (i = 0; i < dim; i++) {
+		ASSERT_TRUE(spPointGetAxisCoor(p1, i) == data1[i]);
+	}
+	//assertions for p2, spPointGetAxisCoor works also when length(data)>dim
+	for (int i = 0; i < dim; i++) {
+		ASSERT_TRUE(spPointGetAxisCoor(p2, i) == data2[i]);
+	}
+	spPointDestroy(p1);
+	spPointDestroy(p2);
+	return true;
+}
+
+//check if spPointL2SquaredDistance works
 bool pointBasicL2Distance() {
 	double data1[2] = { 1.0, 1.0 };
 	double data2[2] = { 1.0, 0.0 };
@@ -35,7 +128,11 @@ bool pointBasicL2Distance() {
 	return true;
 }
 int main() {
+	RUN_TEST(pointBasicCreateTest);
 	RUN_TEST(pointBasicCopyTest);
+	RUN_TEST(pointGetDimentionTest);
+	RUN_TEST(pointGetIndexTest);
+	RUN_TEST( pointGetAxisCoorTest);
 	RUN_TEST(pointBasicL2Distance);
 	return 0;
 }
