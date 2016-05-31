@@ -70,23 +70,39 @@ static bool basicLoggerDebugTest() {
 	return true;
 }
 
+//In Info level all messages EXCEPT debug messages will be printed (i.e., error, warning and info).
 static bool basicLoggerInfoTest() {
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
-	// TODO finish and doc
+
+	const char* expectedFile = "basicLoggerInfoTestExp.log";
+	const char* testFile = "basicLoggerInfoTest.log";
+	ASSERT_TRUE(spLoggerCreate(testFile, SP_LOGGER_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintError("MSGA","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintInfo("MSGC") == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintDebug("MSGD","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
 	spLoggerDestroy();
+	ASSERT_TRUE(identicalFiles(testFile,expectedFile));
 	return true;
 
 }
 
+//In Warning level only warning and error messages will be printed.
 static bool basicLoggerWarningTest() {
-	// TODO finish and doc
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+
+	const char* expectedFile = "basicLoggerWarningTestExp.log";
+	const char* testFile = "basicLoggerWarningTest.log";
+	ASSERT_TRUE(spLoggerCreate(testFile, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintError("MSGA","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintInfo("MSGC") == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintDebug("MSGD","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
 	spLoggerDestroy();
+	ASSERT_TRUE(identicalFiles(testFile,expectedFile));
 	return true;
 
 }
 
-// test spLoggerCreate function
+// test spLoggerCreate function and it's edge cases
 static bool spLoggerCreateTest() {
 	const char* badFile = "\n~~@#%%^s\\n/tf\n";
 	
@@ -100,6 +116,7 @@ static bool spLoggerCreateTest() {
 	return true;
 }
 
+// test spLoggerPrintWarning function and it's edge cases
 static bool spLoggerPrintWarningTest() {
 	// test edge cases
 	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_UNDIFINED);
@@ -128,6 +145,7 @@ static bool spLoggerPrintWarningTest() {
 	return true;
 }
 
+// test spLoggerPrintError function and it's edge cases
 static bool spLoggerPrintErrorTest() {
  	// test edge cases
 	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_UNDIFINED);
@@ -158,6 +176,7 @@ static bool spLoggerPrintErrorTest() {
 
 
 
+// test spLoggerPrintInfo function and it's edge cases
 static bool spLoggerPrintInfoTest(){
 
 	// test edge cases
@@ -187,6 +206,7 @@ static bool spLoggerPrintInfoTest(){
 }
 
 
+// test spLoggerPrintDebug function and it's edge cases
 static bool spLoggerPrintDebugTest() {
 
 // test edge cases
@@ -217,6 +237,7 @@ static bool spLoggerPrintDebugTest() {
 }
 
 
+// test spLoggerPrintMsg function and it's edge cases
 static bool spLoggerPrintMsgTest() {
 
 // test edge cases
@@ -256,3 +277,4 @@ int main() {
 	RUN_TEST(spLoggerCreateTest);
 	return 0;
 }
+

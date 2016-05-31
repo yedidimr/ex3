@@ -14,7 +14,7 @@ static bool spBPQueueCreateTest(){
 	
 	return true;
 }
-/*
+
 static bool spBPQueueCopyTest(){
 	SPBPQueue source = spBPQueueCreate(3); 
 	SPBPQueue copy ;
@@ -170,16 +170,20 @@ static bool spBPQueuePeekLastTest(){
 
 
 static bool spBPQueueMinValueTest() {
+	double val ;
 	SPBPQueue source = spBPQueueCreate(2); 
 	// test minValue on empty queue
 	ASSERT_TRUE(-1.0 == spBPQueueMinValue(source));
 	spBPQueueEnqueue(source, spListElementCreate(2,2.0));
 	// test different scenarios
-	ASSERT_TRUE(2.0 == spBPQueueMinValue(source));
+	val = spBPQueueMinValue(source);
+	ASSERT_TRUE(2.0 == val);
 	spBPQueueEnqueue(source, spListElementCreate(1,1.0));
-	ASSERT_TRUE(1.0 == spBPQueueMinValue(source));
+	val = spBPQueueMinValue(source);
+	ASSERT_TRUE(1.0 == val);
 	spBPQueueEnqueue(source, spListElementCreate(0,0.0));
-	ASSERT_TRUE(0.0 == spBPQueueMinValue(source));
+	val = spBPQueueMinValue(source);
+	ASSERT_TRUE(0.0 == val);
 	
 	spBPQueueDestroy(source);
 	return true;
