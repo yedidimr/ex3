@@ -71,7 +71,7 @@ struct sp_point_t{
 		// initializing point arguments
 		point->index = index;
 		point->dim = dim;
-		point->coordinates = coorData;
+		point->coordinates = coorData; //TODO: do like in lec3
 
 		return point;
 		}
