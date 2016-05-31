@@ -22,8 +22,6 @@ struct sp_point_t{
 		double* coorData;
 		int i;
 
-
-
 		// check validation of parameters
 		if (data == NULL) {
 			return NULL;
@@ -41,21 +39,20 @@ struct sp_point_t{
 		}
 
 		// allocate memory for coorData
-		coorData = (double*)malloc(dim*sizeof(double));
-		if (coorData == NULL){
+		point->coordinates = (double*)malloc(dim*sizeof(double));
+		if (point->coordinates == NULL){ //Allocation failure - need to free(point)
+			free(point);
 			return NULL;
 		}
 
 		//get data
 		for (i=0; i<dim; i++){
-			coorData[i] = data[i];
+			point->coordinates[i] = data[i];
 		}
 
-
-		// initializing point arguments
+		// initializing the rest of point arguments
 		point->index = index;
 		point->dim = dim;
-		point->coordinates = coorData; //TODO: do like in lec3
 
 		return point;
 		}
