@@ -19,7 +19,6 @@ struct sp_point_t{
 	SPPoint spPointCreate(double* data, int dim, int index){
 
 		SPPoint point;
-		double* coorData;
 		int i;
 
 		// check validation of parameters
