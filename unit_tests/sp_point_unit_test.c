@@ -2,7 +2,7 @@
 #include "unit_test_util.h"
 #include <stdbool.h>
 
-//TODO: do we need to check NULL and assert?
+
 //TODO: do we need to check destroy? if so, how?
 
 //check if create works
@@ -63,7 +63,6 @@ bool pointBasicCopyTest() {
 }
 
 //Checks if spPointGetDimension Works
-//TODO: has assert- do I need to check it?
 bool pointGetDimentionTest() {
 	double data[5] = {0.0, 1.0, 2.0, 3.0, 4.0};
 	int dim = 5;
@@ -75,7 +74,6 @@ bool pointGetDimentionTest() {
 }
 
 //Checks if spPointGetIndex Works
-//TODO: has assert- do I need to check it?
 bool pointGetIndexTest() {
 	double data[5] = {4.0, 3.0, 2.0, 1.0, 1.0};
 	int dim = 5;
@@ -87,7 +85,6 @@ bool pointGetIndexTest() {
 }
 
 //Checks if spPointGetAxisCoor Works
-//TODO: has assert- do I need to check it?
 bool pointGetAxisCoorTest() {
 	double data1[5] = {0.0, 1.0, 2.0, 3.0, 4.0};
 	double data2[7] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
