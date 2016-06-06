@@ -89,7 +89,7 @@ struct sp_point_t{
 	}
 
 	double spPointL2SquaredDistance(SPPoint p, SPPoint q){
-		double sum;   // Holds temporary sum
+		double sum = 0.0;   // Holds temporary sum
 		double pVal;  // holds current p_i value
 		double qVal;  // holds current q_i value
 		double pqSub; // holds current p_i-q_i value
