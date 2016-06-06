@@ -22,13 +22,7 @@ struct sp_point_t{
 		int i;
 
 		// check validation of parameters
-		if (data == NULL) {
-			return NULL;
-		}
-		if (dim <= 0) {
-			return NULL;
-		}
-		if (index < 0) {
+		if (data == NULL || dim <= 0 || index < 0) {
 			return NULL;
 		}
 
@@ -37,7 +31,7 @@ struct sp_point_t{
 			return NULL;
 		}
 
-		// allocate memory for coorData
+		// allocate memory for point->coordinates
 		point->coordinates = (double*)malloc(dim*sizeof(double));
 		if (point->coordinates == NULL){ //Allocation failure - need to free(point)
 			free(point);

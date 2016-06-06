@@ -3,47 +3,76 @@
 #include <stdbool.h>
 
 
-//TODO: do we need to check destroy? if so, how?
 
-//check if create works
+//check if create works in general
 static bool pointBasicCreateTest() {
-	double data1[5] = {0.0, 1.0, 2.0, 3.0, 4.0};
-	double data2[7] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+	double data[5] = {0.0, 1.0, 2.0, 3.0, 4.0};
 	int dim = 5;
-	int index = 5;
+	int index = 7;
 	int i;
-	//create points
-	SPPoint p1 = spPointCreate(data1, dim, index);
-	SPPoint p2 = spPointCreate(data2, dim, index);
-	SPPoint p3 = spPointCreate(NULL, dim, index);
-	SPPoint p4 = spPointCreate(data1, 0, index);
-	SPPoint p5 = spPointCreate(data1, dim, -1);
-	//check create works in general
-	ASSERT_TRUE(spPointGetIndex(p1) == index);
-	ASSERT_TRUE(spPointGetDimension(p1) == dim);
+	// create point
+	SPPoint p = spPointCreate(data, dim, index);
+	// check point was created correctly
+	ASSERT_TRUE(spPointGetIndex(p) == index);
+	ASSERT_TRUE(spPointGetDimension(p) == dim);
 	for (i = 0; i < dim; i++) {
-		ASSERT_TRUE(spPointGetAxisCoor(p1, i) == data1[i]);
+		ASSERT_TRUE(spPointGetAxisCoor(p, i) == data[i]);
 	}
-	//check create works when length(Data)>dim
-	ASSERT_TRUE(spPointGetIndex(p2) == index);
-	ASSERT_TRUE(spPointGetDimension(p2) == dim);
-	for (i = 0; i < dim; i++) {
-		ASSERT_TRUE(spPointGetAxisCoor(p2, i) == data2[i]);
-	}
-	//check create returns NULL when data==Null
-	ASSERT_TRUE(p3 == NULL);
-	//check create returns NULL when dim=0
-	ASSERT_TRUE(p4 == NULL);
-	//check create returns NULL when index==-1
-	ASSERT_TRUE(p5 == NULL);
-	//destroy points
-	spPointDestroy(p1);
-	spPointDestroy(p2);
-	spPointDestroy(p3);
-	spPointDestroy(p4);
-	spPointDestroy(p5);
+	spPointDestroy(p);
 	return true;
 }
+
+//check create works when length(Data)>dim
+static bool pointCreateDataBigrDimTest() {
+	double data[7] = {0.1, 1.2, 2.3, 3.9, 4.0, 5.6, 6.3};
+	int dim = 5;
+	int index = 7;
+	int i;
+	// create point
+	SPPoint p = spPointCreate(data, dim, index);
+	// check point was created correctly
+	ASSERT_TRUE(spPointGetIndex(p) == index);
+	ASSERT_TRUE(spPointGetDimension(p) == dim);
+	for (i = 0; i < dim; i++) {
+		ASSERT_TRUE(spPointGetAxisCoor(p, i) == data[i]);
+	}
+	spPointDestroy(p);
+	return true;
+}
+
+//check create returns NULL when data==Null
+static bool pointCreateDataNullTest() {
+	int dim = 5;
+	int index = 7;
+	SPPoint p = spPointCreate(NULL, dim, index);
+	ASSERT_TRUE(p == NULL);
+	spPointDestroy(p);
+	return true;
+}
+
+//check create returns NULL when dim=0
+static bool pointCreateDimZeroTest() {
+	double data[9] = {87.5, 42.13, 0.1, 1.2, 2.3, 3.9, 4.0, 5.6, 6.3};
+	int dim = 0;
+	int index = 3;
+	SPPoint p = spPointCreate(data, dim, index);
+	ASSERT_TRUE(p == NULL);
+	spPointDestroy(p);
+	return true;
+}
+
+
+//check create returns NULL when index==-1
+static bool pointCreateIndexNegTest() {
+	double data[9] = {87.5, 42.13, 0.1, 1.2, 2.3, 3.9, 4.0, 5.6, 6.3};
+	int dim = 9;
+	int index = -1;
+	SPPoint p = spPointCreate(data, dim, index);
+	ASSERT_TRUE(p == NULL);
+	spPointDestroy(p);
+	return true;
+}
+
 
 //Checks if spPointCopy Works
 static bool pointBasicCopyTest() {
@@ -68,7 +97,7 @@ static bool pointGetDimentionTest() {
 	int dim = 5;
 	int index = 3;
 	SPPoint p = spPointCreate(data, dim, index);
-	ASSERT_TRUE(spPointGetDimension(p) == 5);
+	ASSERT_TRUE(spPointGetDimension(p) == dim);
 	spPointDestroy(p);
 	return true;
 }
@@ -79,35 +108,41 @@ static bool pointGetIndexTest() {
 	int dim = 5;
 	int index = 3;
 	SPPoint p = spPointCreate(data, dim, index);
-	ASSERT_TRUE(spPointGetIndex(p) == 3);
+	ASSERT_TRUE(spPointGetIndex(p) == index);
 	spPointDestroy(p);
 	return true;
 }
 
 //Checks if spPointGetAxisCoor Works
 static bool pointGetAxisCoorTest() {
-	double data1[5] = {0.0, 1.0, 2.0, 3.0, 4.0};
-	double data2[7] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+	double data[5] = {0.0, 1.0, 2.0, 3.0, 4.0};
 	int dim = 5;
 	int index = 3;
 	int i;
 	//create points
-	SPPoint p1 = spPointCreate(data1, dim, index);
-	SPPoint p2 = spPointCreate(data2, dim, index);
-	//assertions for p1
+	SPPoint p = spPointCreate(data, dim, index);
+	// check spPointGetAxisCoor works for every i
 	for (i = 0; i < dim; i++) {
-		ASSERT_TRUE(spPointGetAxisCoor(p1, i) == data1[i]);
+		ASSERT_TRUE(spPointGetAxisCoor(p, i) == data[i]);
 	}
-	//assertions for p2, spPointGetAxisCoor works also when length(data)>dim
-	for (int i = 0; i < dim; i++) {
-		ASSERT_TRUE(spPointGetAxisCoor(p2, i) == data2[i]);
-	}
-	spPointDestroy(p1);
-	spPointDestroy(p2);
+	spPointDestroy(p);
 	return true;
 }
 
-//check if spPointL2SquaredDistance works
+//Checks if spPointGetAxisCoor Works also when length(data)>dim
+static bool pointGetAxisCoorBigDataTest() {
+	double data[7] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+	int dim = 5;
+	int index = 3;
+	SPPoint p = spPointCreate(data, dim, index);
+	for (int i = 0; i < dim; i++) {
+			ASSERT_TRUE(spPointGetAxisCoor(p, i) == data[i]);
+	}
+	spPointDestroy(p);
+	return true;
+}
+
+//spPointL2SquaredDistance: check point with itself is 0, check point with different point is not 0
 static bool pointBasicL2Distance() {
 	double data1[2] = { 1.0, 1.0 };
 	double data2[2] = { 1.0, 0.0 };
@@ -125,12 +160,57 @@ static bool pointBasicL2Distance() {
 	return true;
 }
 
+//spPointL2SquaredDistance: check  spPointL2SquaredDistance(p,q)==spPointL2SquaredDistance(q,p)
+static bool pointBasicL2DistanceDifPlaces() {
+	double data1[7] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+	double data2[7] = {87.5, 42.13, 0.1, 1.2, 2.3, 3.9, 4.0};
+	int dim1 = 7;
+	int dim2 = 7;
+	int index1 = 1;
+	int index2 = 2;
+	SPPoint p = spPointCreate((double *)data1, dim1, index1);
+	SPPoint q = spPointCreate((double *)data2, dim2, index2);
+	ASSERT_TRUE(spPointL2SquaredDistance(p,q) == spPointL2SquaredDistance(q,p));
+	ASSERT_FALSE(spPointL2SquaredDistance(p,q) == 0.0);
+	spPointDestroy(p);
+	spPointDestroy(q);
+	return true;
+}
+
+//spPointL2SquaredDistance: check  distance between two point with same data is 0
+static bool pointBasicL2DistanceTwoPointsSameData() {
+	double data[7] = {87.5, 42.13, 0.1, 1.2, 2.3, 3.9, 4.0};
+	int dim = 7;
+	int index = 2;
+	SPPoint p = spPointCreate((double *)data, dim, index);
+	SPPoint q = spPointCreate((double *)data, dim, index);
+	ASSERT_TRUE(spPointL2SquaredDistance(p,q) == 0.0);
+	spPointDestroy(p);
+	spPointDestroy(q);
+	return true;
+}
+
+
+//check NULL case of spPointDestroy
+static bool pointDestroyTest() {
+	spPointDestroy(NULL);
+	return true;
+}
+
 int main() {
 	RUN_TEST(pointBasicCreateTest);
+	RUN_TEST(pointCreateDataBigrDimTest);
+	RUN_TEST(pointCreateDataNullTest);
+	RUN_TEST(pointCreateDimZeroTest);
+	RUN_TEST(pointCreateIndexNegTest);
 	RUN_TEST(pointBasicCopyTest);
 	RUN_TEST(pointGetDimentionTest);
 	RUN_TEST(pointGetIndexTest);
-	RUN_TEST( pointGetAxisCoorTest);
+	RUN_TEST(pointGetAxisCoorTest);
+	RUN_TEST(pointGetAxisCoorBigDataTest);
 	RUN_TEST(pointBasicL2Distance);
+	RUN_TEST(pointBasicL2DistanceDifPlaces);
+	RUN_TEST(pointBasicL2DistanceTwoPointsSameData);
+	RUN_TEST(pointDestroyTest);
 	return 0;
 }
