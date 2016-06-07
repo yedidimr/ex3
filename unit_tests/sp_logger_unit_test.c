@@ -80,6 +80,7 @@ static bool basicLoggerInfoTest() {
 	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
 	ASSERT_TRUE(spLoggerPrintInfo("MSGC") == SP_LOGGER_SUCCESS);
 	ASSERT_TRUE(spLoggerPrintDebug("MSGD","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintMsg("MSGE") == SP_LOGGER_SUCCESS);
 	spLoggerDestroy();
 	ASSERT_TRUE(identicalFiles(testFile,expectedFile));
 	return true;
@@ -88,7 +89,6 @@ static bool basicLoggerInfoTest() {
 
 //In Warning level only warning and error messages will be printed.
 static bool basicLoggerWarningTest() {
-
 	const char* expectedFile = "basicLoggerWarningTestExp.log";
 	const char* testFile = "basicLoggerWarningTest.log";
 	ASSERT_TRUE(spLoggerCreate(testFile, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
@@ -96,185 +96,174 @@ static bool basicLoggerWarningTest() {
 	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
 	ASSERT_TRUE(spLoggerPrintInfo("MSGC") == SP_LOGGER_SUCCESS);
 	ASSERT_TRUE(spLoggerPrintDebug("MSGD","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintMsg("MSGE") == SP_LOGGER_SUCCESS);
 	spLoggerDestroy();
 	ASSERT_TRUE(identicalFiles(testFile,expectedFile));
 	return true;
 
 }
 
-// test spLoggerCreate function and it's edge cases
-static bool spLoggerCreateTest() {
-	const char* badFile = "\n~~@#%%^s\\n/tf\n";
-	
+// test spLoggerCreate success 
+static bool spLoggerCreateSuccessTest() {
 	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_DEFINED);
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_DEFINED);
 	spLoggerDestroy();
-	ASSERT_TRUE(spLoggerCreate(badFile, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_CANNOT_OPEN_FILE);
+	return true;
+}
+
+// test SP_LOGGER_DEFINED return value of spLoggerCreate for the same logging level
+static bool spLoggerCreateDefinedTest() {
+	// create logger
+	spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL);
+	// try to create again with the same level
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_DEFINED);
 	spLoggerDestroy();
 	
 	return true;
 }
 
-// test spLoggerPrintWarning function and it's edge cases
-static bool spLoggerPrintWarningTest() {
-	// test edge cases
+
+
+// test SP_LOGGER_DEFINED return value of spLoggerCreate for the same logging level
+static bool spLoggerCreateDefinedOtherLevelTest() {
+	// create logger
+	spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL);
+	// try to create again with different level
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_DEFINED);
+	spLoggerDestroy();
+	return true;
+}
+
+// test failue when trying to open bad filename
+static bool spLoggerCreateBadFilenameTest() {
+	const char * badFilename = "\n~~@#%%^s\\n/tf\n" ;// TODO move to #define BAD_UNIX_FILENAME "\n~~@#%%^s\\n/tf\n" if it's possible to change log files (line number)// filename that cannot be created under unix os
+
+	ASSERT_TRUE(spLoggerCreate(badFilename, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_CANNOT_OPEN_FILE);	
+	return true;
+}
+
+// test writing to  spLoggerPrintWarning when logger is undefined
+static bool spLoggerPrintWarningUndefinedTest() {
 	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_UNDIFINED);
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+	return true;
+}
+
+
+// test writing to  spLoggerPrintInfo when logger is undefined
+static bool spLoggerPrintInfoUndefinedTest() {
+	ASSERT_TRUE(spLoggerPrintInfo("A") == SP_LOGGER_UNDIFINED);
+	spLoggerDestroy();
+	return true;
+}
+
+
+// test writing to  spLoggerPrintDebug when logger is undefined
+static bool spLoggerPrintDebugUndefinedTest() {
+	ASSERT_TRUE(spLoggerPrintDebug("A","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_UNDIFINED);
+	spLoggerDestroy();
+	return true;
+}
+
+// test writing to  spLoggerPrintMsg when logger is undefined
+static bool spLoggerPrintMsgUndefinedTest() {
+	ASSERT_TRUE(spLoggerPrintMsg("A") == SP_LOGGER_UNDIFINED);
+	spLoggerDestroy();
+	return true;
+}
+
+
+// test all invalid arguments for spLoggerPrintWarning function 
+static bool spLoggerPrintWarningInvalidArgTest() {
+	// test edge cases
+	spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL);
 	ASSERT_TRUE(spLoggerPrintWarning(NULL,"sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
 	ASSERT_TRUE(spLoggerPrintWarning("MSGB",NULL,__func__,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
 	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",NULL,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
 	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,-12) == SP_LOGGER_INVAlID_ARGUMENT);
 	ASSERT_TRUE(spLoggerPrintWarning("MSGB",NULL,NULL,-1) == SP_LOGGER_INVAlID_ARGUMENT);
-	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
-	spLoggerDestroy();
-	
-	// test each debug level
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
-	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
-	spLoggerDestroy();
-
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
-	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
-	spLoggerDestroy();
-	
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
-	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
 	spLoggerDestroy();
 
 	return true;
 }
 
-// test spLoggerPrintError function and it's edge cases
-static bool spLoggerPrintErrorTest() {
+
+
+// test all invalid arguments for spLoggerPrintError function 
+static bool spLoggerPrintErrorInvalidArgTest() {
  	// test edge cases
-	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_UNDIFINED);
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	spLoggerCreate(NULL, SP_LOGGER_ERROR_LEVEL);
 	ASSERT_TRUE(spLoggerPrintError(NULL,"sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
 	ASSERT_TRUE(spLoggerPrintError("MSGB",NULL,__func__,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
 	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",NULL,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
 	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,-12) == SP_LOGGER_INVAlID_ARGUMENT);
 	ASSERT_TRUE(spLoggerPrintError("MSGB",NULL,NULL,-1) == SP_LOGGER_INVAlID_ARGUMENT);
-	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
 	spLoggerDestroy();
-	
-	// test each debug level
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL ) == SP_LOGGER_SUCCESS);
-	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
-	spLoggerDestroy();
-
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
-	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
-	spLoggerDestroy();
-
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
-	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
-	spLoggerDestroy();
-
 	return true;
 }
 
 
 
-// test spLoggerPrintInfo function and it's edge cases
-static bool spLoggerPrintInfoTest(){
+// test all invalid arguments for spLoggerPrintInfo function 
+static bool spLoggerPrintInfoInvalidArgTest(){
 
 	// test edge cases
-	ASSERT_TRUE(spLoggerPrintInfo("MSGB") == SP_LOGGER_UNDIFINED);
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL);
 	ASSERT_TRUE(spLoggerPrintInfo(NULL) == SP_LOGGER_INVAlID_ARGUMENT);
-	ASSERT_TRUE(spLoggerPrintInfo("MSGB") == SP_LOGGER_SUCCESS);
 	spLoggerDestroy();
-	
-	// test each debug level
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
-	ASSERT_TRUE(spLoggerPrintInfo("MSGB") == SP_LOGGER_SUCCESS);
-	spLoggerDestroy();
-
-
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
-	ASSERT_TRUE(spLoggerPrintInfo("MSGB") == SP_LOGGER_SUCCESS);
-	spLoggerDestroy();
-
-	
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
-	ASSERT_TRUE(spLoggerPrintInfo("MSGB") == SP_LOGGER_SUCCESS);
-	spLoggerDestroy();
-
 	return true;
 
 }
-
-
-// test spLoggerPrintDebug function and it's edge cases
-static bool spLoggerPrintDebugTest() {
-
-// test edge cases
-	ASSERT_TRUE(spLoggerPrintDebug("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_UNDIFINED);
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+// test all invalid arguments for spLoggerPrintDebug function 
+static bool spLoggerPrintDebugInvalidArgTest() {
+	spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL);
 	ASSERT_TRUE(spLoggerPrintDebug("MSGB",NULL,__func__,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
 	ASSERT_TRUE(spLoggerPrintDebug(NULL,"sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
 	ASSERT_TRUE(spLoggerPrintDebug("MSGB","sp_logger_unit_test.c",NULL,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
 	ASSERT_TRUE(spLoggerPrintDebug("MSGB","sp_logger_unit_test.c",__func__,-12) == SP_LOGGER_INVAlID_ARGUMENT);
 	ASSERT_TRUE(spLoggerPrintDebug("MSGB",NULL,NULL,-1) == SP_LOGGER_INVAlID_ARGUMENT);
-	ASSERT_TRUE(spLoggerPrintDebug("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
-	spLoggerDestroy();
-	
-	// test each debug level
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
-	ASSERT_TRUE(spLoggerPrintDebug("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
-	spLoggerDestroy();
-
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
-	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
-	spLoggerDestroy();
-	
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
-	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_SUCCESS);
 	spLoggerDestroy();
 
 	return true;
 }
 
 
-// test spLoggerPrintMsg function and it's edge cases
-static bool spLoggerPrintMsgTest() {
+// test all invalid arguments for spLoggerPrintMsg function 
+static bool spLoggerPrintMsgInvalidArgTest() {
 
-// test edge cases
-	ASSERT_TRUE(spLoggerPrintMsg("MSGB") == SP_LOGGER_UNDIFINED);
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL);
 	ASSERT_TRUE(spLoggerPrintMsg(NULL) == SP_LOGGER_INVAlID_ARGUMENT);
-	ASSERT_TRUE(spLoggerPrintMsg("MSGB") == SP_LOGGER_SUCCESS);
-	spLoggerDestroy();
-
-
-	// test each debug level
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
-	ASSERT_TRUE(spLoggerPrintMsg("MSGB") == SP_LOGGER_SUCCESS);
-	spLoggerDestroy();
-
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
-	ASSERT_TRUE(spLoggerPrintMsg("MSGB") == SP_LOGGER_SUCCESS);
-	spLoggerDestroy();
-	
-	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
-	ASSERT_TRUE(spLoggerPrintMsg("MSGB") == SP_LOGGER_SUCCESS);
 	spLoggerDestroy();
 	return true;
 }
+
 
 int main() {
-	RUN_TEST(basicLoggerTest);
+	// general logger tests
+	RUN_TEST(spLoggerCreateSuccessTest);
+	RUN_TEST(spLoggerCreateDefinedTest);
+	RUN_TEST(spLoggerCreateDefinedOtherLevelTest);
+	RUN_TEST(spLoggerCreateBadFilenameTest);
+
+	// test writing to log at each level
 	RUN_TEST(basicLoggerErrorTest);
 	RUN_TEST(basicLoggerDebugTest);
 	RUN_TEST(basicLoggerWarningTest);
 	RUN_TEST(basicLoggerInfoTest);
-	RUN_TEST(spLoggerPrintErrorTest);
-	RUN_TEST(spLoggerPrintWarningTest);
-	RUN_TEST(spLoggerPrintDebugTest);
-	RUN_TEST(spLoggerPrintInfoTest);
-	RUN_TEST(spLoggerPrintMsgTest);
-	RUN_TEST(spLoggerCreateTest);
+
+	// test logger undifined for all levels
+	RUN_TEST(basicLoggerTest);
+	RUN_TEST(spLoggerPrintWarningUndefinedTest);
+	RUN_TEST(spLoggerPrintInfoUndefinedTest);
+	RUN_TEST(spLoggerPrintDebugUndefinedTest);
+	RUN_TEST(spLoggerPrintMsgUndefinedTest);
+
+	// test invalid argument for all levels
+	RUN_TEST(spLoggerPrintWarningInvalidArgTest);
+	RUN_TEST(spLoggerPrintErrorInvalidArgTest);
+	RUN_TEST(spLoggerPrintDebugInvalidArgTest);
+	RUN_TEST(spLoggerPrintInfoInvalidArgTest);
+	RUN_TEST(spLoggerPrintMsgInvalidArgTest);
+
 	return 0;
 }
 
