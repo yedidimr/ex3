@@ -160,7 +160,7 @@ static bool spLoggerCreateDefinedOtherLevelTest() {
 
 // test failue when trying to open bad filename
 static bool spLoggerCreateBadFilenameTest() {
-	const char * badFilename = "\n~~@#%%^s\\n/tf\n" ;// TODO move to #define BAD_UNIX_FILENAME "\n~~@#%%^s\\n/tf\n" if it's possible to change log files (line number)// filename that cannot be created under unix os
+	const char * badFilename = "\n~~@#%%^s\\n/tf\n"; // could not define it as conset (#define) since it changed the line number in the log file and made the test fail
 	ASSERT_TRUE(spLoggerCreate(badFilename, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_CANNOT_OPEN_FILE);	
 	return true;
 }
