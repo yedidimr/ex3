@@ -54,6 +54,9 @@ SPBPQueue spBPQueueCopy(SPBPQueue source) {
 		new_queue->head = NULL;
 	} else {
 		new_queue->head = spListCopy(source->head);
+		if (new_queue->head == NULL) {
+			spBPQueueDestroy(new_queue);
+		}
 	}
 	return new_queue;
 }
@@ -96,10 +99,8 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue source, SPListElement element) {
 	double newVal; // the value of the new element to enqueue
 	double maxVal; // the maximum value of the queue before inserting the new element
 	double eVal;   // iterates over all values in the queue
-	SPListElement elementCopy; // a copy of the element
 	SP_BPQUEUE_MSG msg;
 	bool success = false; // true if enqueued successfully
-
 	SPListElement currentElement; // for iterating list
 
 	// argument validation check
@@ -107,21 +108,14 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue source, SPListElement element) {
 		return SP_BPQUEUE_INVALID_ARGUMENT;	
 	}
 	
-	// try to copy element
-	elementCopy = spListElementCopy(element);
-	if (elementCopy == NULL) {
-		return SP_BPQUEUE_OUT_OF_MEMORY;
-	}
-
 	// if queue is empty insert the element as first element
 	if (spBPQueueIsEmpty(source)){
-		msg = convertListMsgToQueueMsg(spListInsertFirst(source->head, elementCopy));
+		msg = convertListMsgToQueueMsg(spListInsertFirst(source->head, element));
 		return msg;
 	} 
 
 	newVal = spListElementGetValue(element);
-	maxVal = spListElementGetValue(spBPQueuePeekLast(source));
-	// maxVal = spBPQueueMaxValue(source);
+	maxVal = spBPQueueMaxValue(source);
 	// if new value to insert is bigger than the maximum value - insert it to the end of the queue if it's not full
 	if (newVal >= maxVal) {
 		// if queue is full don't insert the new element
@@ -130,7 +124,7 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue source, SPListElement element) {
 		}
 		// if queue is not full - insert new element to the end of the queue
 		else {
-			msg = convertListMsgToQueueMsg(spListInsertLast(source->head, elementCopy));
+			msg = convertListMsgToQueueMsg(spListInsertLast(source->head, element));
 			return msg;
 		}
 	}
@@ -140,7 +134,7 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue source, SPListElement element) {
 	while ((!success) && (currentElement)) {
   		eVal = spListElementGetValue(currentElement);
   		if ((newVal < eVal)) {
-			msg = convertListMsgToQueueMsg(spListInsertBeforeCurrent(source->head, elementCopy));
+			msg = convertListMsgToQueueMsg(spListInsertBeforeCurrent(source->head, element));
 			// return in case of failure
 			// keep iterating till the end of the queue in case of success insert
 			if (msg != SP_BPQUEUE_SUCCESS) {
@@ -160,6 +154,7 @@ SP_BPQUEUE_MSG spBPQueueEnqueue(SPBPQueue source, SPListElement element) {
 		msg = spQueueRemoveLast(source);
 	}
 
+	msg = SP_BPQUEUE_SUCCESS;
 	return msg;
 }
 
@@ -174,9 +169,8 @@ SP_BPQUEUE_MSG spQueueRemoveLast(SPBPQueue source) {
 		return SP_BPQUEUE_INVALID_ARGUMENT;
 	}
 
-	// iterate to last
+	// iterate until we get to the last element
 	currentElement = spListGetFirst(source->head);
-
 	nextElement = spListGetNext(source->head);
 	while (nextElement) {
 		currentElement = nextElement;
@@ -273,7 +267,6 @@ bool spBPQueueIsEmpty(SPBPQueue source) {
 
 bool spBPQueueIsFull(SPBPQueue source) {
 	assert((source!=NULL) && (spBPQueueIsEmpty(source) == false));
-	assert(source!=NULL);
 	return spBPQueueGetMaxSize(source) == spBPQueueSize(source);
 }
 
