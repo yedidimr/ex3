@@ -113,7 +113,7 @@ static bool spLoggerCreateSuccessTest() {
 // test SP_LOGGER_DEFINED return value of spLoggerCreate for the same logging level
 static bool spLoggerCreateDefinedTest() {
 	// create logger
-	spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL);
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
 	// try to create again with the same level
 	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_DEFINED);
 	spLoggerDestroy();
@@ -126,7 +126,7 @@ static bool spLoggerCreateDefinedTest() {
 // test SP_LOGGER_DEFINED return value of spLoggerCreate for the same logging level
 static bool spLoggerCreateDefinedOtherLevelTest() {
 	// create logger
-	spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL);
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
 	// try to create again with different level
 	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_DEFINED);
 	spLoggerDestroy();
@@ -136,7 +136,6 @@ static bool spLoggerCreateDefinedOtherLevelTest() {
 // test failue when trying to open bad filename
 static bool spLoggerCreateBadFilenameTest() {
 	const char * badFilename = "\n~~@#%%^s\\n/tf\n" ;// TODO move to #define BAD_UNIX_FILENAME "\n~~@#%%^s\\n/tf\n" if it's possible to change log files (line number)// filename that cannot be created under unix os
-
 	ASSERT_TRUE(spLoggerCreate(badFilename, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_CANNOT_OPEN_FILE);	
 	return true;
 }
@@ -175,7 +174,7 @@ static bool spLoggerPrintMsgUndefinedTest() {
 // test all invalid arguments for spLoggerPrintWarning function 
 static bool spLoggerPrintWarningInvalidArgTest() {
 	// test edge cases
-	spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL);
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
 	ASSERT_TRUE(spLoggerPrintWarning(NULL,"sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
 	ASSERT_TRUE(spLoggerPrintWarning("MSGB",NULL,__func__,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
 	ASSERT_TRUE(spLoggerPrintWarning("MSGB","sp_logger_unit_test.c",NULL,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
@@ -191,7 +190,7 @@ static bool spLoggerPrintWarningInvalidArgTest() {
 // test all invalid arguments for spLoggerPrintError function 
 static bool spLoggerPrintErrorInvalidArgTest() {
  	// test edge cases
-	spLoggerCreate(NULL, SP_LOGGER_ERROR_LEVEL);
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
 	ASSERT_TRUE(spLoggerPrintError(NULL,"sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
 	ASSERT_TRUE(spLoggerPrintError("MSGB",NULL,__func__,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
 	ASSERT_TRUE(spLoggerPrintError("MSGB","sp_logger_unit_test.c",NULL,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
@@ -207,7 +206,7 @@ static bool spLoggerPrintErrorInvalidArgTest() {
 static bool spLoggerPrintInfoInvalidArgTest(){
 
 	// test edge cases
-	spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL);
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
 	ASSERT_TRUE(spLoggerPrintInfo(NULL) == SP_LOGGER_INVAlID_ARGUMENT);
 	spLoggerDestroy();
 	return true;
@@ -215,7 +214,7 @@ static bool spLoggerPrintInfoInvalidArgTest(){
 }
 // test all invalid arguments for spLoggerPrintDebug function 
 static bool spLoggerPrintDebugInvalidArgTest() {
-	spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL);
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
 	ASSERT_TRUE(spLoggerPrintDebug("MSGB",NULL,__func__,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
 	ASSERT_TRUE(spLoggerPrintDebug(NULL,"sp_logger_unit_test.c",__func__,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
 	ASSERT_TRUE(spLoggerPrintDebug("MSGB","sp_logger_unit_test.c",NULL,__LINE__) == SP_LOGGER_INVAlID_ARGUMENT);
@@ -229,8 +228,7 @@ static bool spLoggerPrintDebugInvalidArgTest() {
 
 // test all invalid arguments for spLoggerPrintMsg function 
 static bool spLoggerPrintMsgInvalidArgTest() {
-
-	spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL);
+	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
 	ASSERT_TRUE(spLoggerPrintMsg(NULL) == SP_LOGGER_INVAlID_ARGUMENT);
 	spLoggerDestroy();
 	return true;
