@@ -54,8 +54,6 @@ SPBPQueue spBPQueueCopy(SPBPQueue source) {
 		new_queue->head = NULL;
 	} else {
 		new_queue->head = spListCopy(source->head);
-		if (new_queue->head == NULL) {
-		}
 	}
 	return new_queue;
 }
