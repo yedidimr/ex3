@@ -103,6 +103,31 @@ static bool basicLoggerWarningTest() {
 
 }
 
+//test spLoggerPrintMsg success on  Error lever
+static bool basicLoggerErrorPrintMsgTest() {
+	const char* expectedFile = "basicLoggerPrintMsgTestExp.log";
+	const char* testFile = "basicLoggerErrorPrintMsgTest.log";
+	ASSERT_TRUE(spLoggerCreate(testFile,SP_LOGGER_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintMsg("MSGE") == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+	ASSERT_TRUE(identicalFiles(testFile,expectedFile));
+	return true;
+}
+
+
+
+//test spLoggerPrintMsg success on  Debug lever
+static bool basicLoggerDebugPrintMsgTest() {
+	const char* expectedFile = "basicLoggerPrintMsgTestExp.log";
+	const char* testFile = "basicLoggerDebugPrintMsgTest.log";
+	ASSERT_TRUE(spLoggerCreate(testFile,SP_LOGGER_DEBUG_INFO_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
+	ASSERT_TRUE(spLoggerPrintMsg("MSGE") == SP_LOGGER_SUCCESS);
+	spLoggerDestroy();
+	ASSERT_TRUE(identicalFiles(testFile,expectedFile));
+	return true;
+}
+
+
 // test spLoggerCreate success 
 static bool spLoggerCreateSuccessTest() {
 	ASSERT_TRUE(spLoggerCreate(NULL, SP_LOGGER_WARNING_ERROR_LEVEL) == SP_LOGGER_SUCCESS);
@@ -247,6 +272,8 @@ int main() {
 	RUN_TEST(basicLoggerDebugTest);
 	RUN_TEST(basicLoggerWarningTest);
 	RUN_TEST(basicLoggerInfoTest);
+	RUN_TEST(basicLoggerErrorPrintMsgTest);
+	RUN_TEST(basicLoggerDebugPrintMsgTest);
 
 	// test logger undifined for all levels
 	RUN_TEST(basicLoggerTest);
