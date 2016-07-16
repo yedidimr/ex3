@@ -22,7 +22,7 @@ struct sp_bp_queue_t {
 
 SPBPQueue spBPQueueCreate(int maxSize){
 	SPBPQueue queue;
-	if (maxSize < 0) {
+	if (maxSize <= 0) {
 		return NULL;
 	}
 
@@ -73,6 +73,9 @@ void spBPQueueClear(SPBPQueue source) {
 }
 
 int spBPQueueSize(SPBPQueue source){
+	if (source == NULL) {
+		return -1;
+	}
 	return spListGetSize(source->head);
 }
 
