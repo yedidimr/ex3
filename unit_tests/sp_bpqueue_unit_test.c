@@ -35,6 +35,7 @@ static bool spBPQueueCopyTest(){
 	ASSERT_TRUE(SP_BPQUEUE_SUCCESS == spBPQueueEnqueue(source, element2));
 	
 	// create a copy
+	copy = spBPQueueCopy(NULL);
 	copy = spBPQueueCopy(source);
 
 	// check that new queue size is the same as the original queue size
@@ -132,6 +133,8 @@ static bool spBPQueueEnqueueFullTest() {
 	SPBPQueue source = spBPQueueCreate(2); 
 	SPListElement element1 = spListElementCreate(1,1.0);
 	SPListElement element2 = spListElementCreate(2,2.0);
+	SPListElement element21 = spListElementCreate(2,1.0);
+	SPListElement element23 = spListElementCreate(2,3.0);
 	SPListElement element3 = spListElementCreate(3,3.0);
 	SPListElement element4 = spListElementCreate(4,4.0);
 	
@@ -144,6 +147,8 @@ static bool spBPQueueEnqueueFullTest() {
 	ASSERT_TRUE(SP_BPQUEUE_FULL == spBPQueueEnqueue(source, element4));
 	// enqueue to full queue - ok value
 	ASSERT_TRUE(SP_BPQUEUE_SUCCESS == spBPQueueEnqueue(source, element2));
+	ASSERT_TRUE(SP_BPQUEUE_FULL == spBPQueueEnqueue(source, element23));
+	ASSERT_TRUE(SP_BPQUEUE_SUCCESS == spBPQueueEnqueue(source, element21));
 	
 	spBPQueueDestroy(source);
 	spListElementDestroy(element1);
